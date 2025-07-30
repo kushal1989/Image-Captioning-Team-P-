@@ -1,1 +1,18 @@
+{
+  "version": "vYYYY-MM-DD", 
+  "notes": "Update this when you regenerate tokenizer or features.",
+
+  "tokenizer": "drive:/TeamDrive/ImageCaptioning/artifacts/vYYYY-MM-DD/tokenizer.pkl",
+
+  "features_train": "drive:/TeamDrive/ImageCaptioning/features/vYYYY-MM-DD/train",
+  "features_val":   "drive:/TeamDrive/ImageCaptioning/features/vYYYY-MM-DD/val",
+
+  "captions_train_json": "drive:/TeamDrive/ImageCaptioning/coco/annotations/captions_train2017.json",
+  "captions_val_json":   "drive:/TeamDrive/ImageCaptioning/coco/annotations/captions_val2017.json",
+
+  "image_size": 299,
+  "normalize": true,
+  "max_caption_len": 40,
+  "feature_type": "spatial"
+}
 
