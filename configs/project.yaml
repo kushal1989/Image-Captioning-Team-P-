@@ -1,1 +1,27 @@
+# === Project-wide settings used by all notebooks ===
+# Adjust these paths to YOUR Google Drive or server locations.
+# Tip: keep them consistent for all teammates.
+
+data_dir: "/content/drive/MyDrive/ic_project/coco"           # MS COCO root (images + annotations)
+features_dir: "/content/drive/MyDrive/ic_project/features"   # where InceptionV3 feature caches go
+artifacts_dir: "/content/drive/MyDrive/ic_project/artifacts" # tokenizer, vocab, checkpoints, etc.
+
+# Image preprocessing
+image_size: 299        # matches InceptionV3
+normalize: true        # scale to [0,1] or use preprocess_input inside the extractor
+
+# Captions / tokenizer
+tokenizer_path: "/content/drive/MyDrive/ic_project/artifacts/tokenizer.pkl"
+max_caption_len: 40
+vocab_min_freq: 5      # drop words with freq < 5 (adjust per dataset size)
+
+# Feature extraction settings
+feature_type: "spatial"  # "spatial" (e.g., 8x8x2048) or "pooled" (2048)
+
+# Data split (if you create a custom subset)
+train_split: 0.80
+val_split: 0.20
+
+# Reproducibility
+seed: 42
 
