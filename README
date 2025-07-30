@@ -1,1 +1,9 @@
-https://colab.research.google.com/drive/1S5-iyLv0QO6KGl5XQbz7nJiJKYPrpjya?usp=sharing#scrollTo=BBabOT3qorSB
+## Open the Total Project Notebook
+
+**Integration (latest)**
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](
+https://colab.research.google.com/github/kushal1989/Image-Captioning-Team-P-/blob/integrate/notebooks/00_total_project.ipynb)
+
+**Stable (main)**
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](
+https://colab.research.google.com/github/kushal1989/Image-Captioning-Team-P-/blob/main/notebooks/00_total_project.ipynb)
