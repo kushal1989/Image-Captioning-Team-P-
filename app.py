@@ -22,12 +22,25 @@ MODEL_PATH = "mymodel.h5"
 TOKENIZER_PATH = "tokenizer.pkl"  # Keep this in GitHub or also use Drive
 
 @st.cache_resource
+from tensorflow.keras.layers import LSTM, Bidirectional, Embedding, Dense, Dropout
+
+@st.cache_resource
 def download_model():
     if not os.path.exists(MODEL_PATH):
         file_id = "1tBVQvprUw6woPkhNF2d-ZFhdywiSsLwY"
         url = f"https://drive.google.com/uc?id={file_id}"
         gdown.download(url, MODEL_PATH, quiet=False)
-    return tf.keras.models.load_model(MODEL_PATH)
+    return tf.keras.models.load_model(
+        MODEL_PATH,
+        custom_objects={
+            "LSTM": LSTM,
+            "Bidirectional": Bidirectional,
+            "Embedding": Embedding,
+            "Dense": Dense,
+            "Dropout": Dropout
+        }
+    )
+
 
 @st.cache_resource
 def load_tokenizer():
