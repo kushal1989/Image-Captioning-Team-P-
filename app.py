@@ -5,32 +5,38 @@ import tensorflow as tf
 import gdown
 import os
 from tensorflow.keras.models import Model
+from tensorflow.keras.layers import LSTM, Bidirectional, Embedding, Dense, Dropout
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from PIL import Image
-from tensorflow.keras.layers import LSTM, Bidirectional, Embedding, Dense, Dropout
 
 # -------------------------
-# Page config
-# -------------------------
-st.set_page_config(page_title="📷 Image Caption Generator", page_icon="📷", layout="centered")
-
-# -------------------------
-# Download model from Google Drive
+# CONFIG
 # -------------------------
 MODEL_PATH = "mymodel.h5"
-TOKENIZER_PATH = "tokenizer.pkl"  # Keep this in GitHub or also use Drive
+TOKENIZER_PATH = "tokenizer.pkl"
 
+# Google Drive file IDs
+MODEL_FILE_ID = "1tBVQvprUw6woPkhNF2d-ZFhdywiSsLwY"      # Replace with your model's Drive ID
+TOKENIZER_FILE_ID = "YOUR_TOKENIZER_FILE_ID"             # Replace with tokenizer's Drive ID
+
+st.set_page_config(page_title="📷 Image Caption Generator", page_icon="📷")
+
+# -------------------------
+# FUNCTIONS
+# -------------------------
 @st.cache_resource
-
-
-@st.cache_resource
-def download_model():
-    if not os.path.exists(MODEL_PATH):
-        file_id = "1tBVQvprUw6woPkhNF2d-ZFhdywiSsLwY"
+def download_file(file_id, output_path):
+    """Download a file from Google Drive using gdown."""
+    if not os.path.exists(output_path):
         url = f"https://drive.google.com/uc?id={file_id}"
-        gdown.download(url, MODEL_PATH, quiet=False)
+        gdown.download(url, output_path, quiet=False)
+    return output_path
+
+@st.cache_resource
+def load_caption_model():
+    download_file(MODEL_FILE_ID, MODEL_PATH)
     return tf.keras.models.load_model(
         MODEL_PATH,
         custom_objects={
@@ -42,36 +48,29 @@ def download_model():
         }
     )
 
-
 @st.cache_resource
 def load_tokenizer():
+    download_file(TOKENIZER_FILE_ID, TOKENIZER_PATH)
     with open(TOKENIZER_PATH, "rb") as f:
         return pickle.load(f)
 
 @st.cache_resource
-def load_mobilenet():
+def load_feature_extractor():
     base_model = MobileNetV2(weights="imagenet")
     return Model(inputs=base_model.inputs, outputs=base_model.layers[-2].output)
 
-mobilenet_model = load_mobilenet()
-caption_model = download_model()
-tokenizer = load_tokenizer()
-
-# -------------------------
-# Caption prediction
-# -------------------------
 def get_word_from_index(index, tokenizer):
     for word, idx in tokenizer.word_index.items():
         if idx == index:
             return word
     return None
 
-def predict_caption(image_features, max_length=34):
+def predict_caption(image_features, tokenizer, model, max_length=34):
     caption = "startseq"
     for _ in range(max_length):
         sequence = tokenizer.texts_to_sequences([caption])[0]
         sequence = pad_sequences([sequence], maxlen=max_length)
-        yhat = caption_model.predict([image_features, sequence], verbose=0)
+        yhat = model.predict([image_features, sequence], verbose=0)
         predicted_index = np.argmax(yhat)
         predicted_word = get_word_from_index(predicted_index, tokenizer)
         if predicted_word is None:
@@ -82,10 +81,17 @@ def predict_caption(image_features, max_length=34):
     return caption.replace("startseq", "").replace("endseq", "").strip()
 
 # -------------------------
+# LOAD MODELS
+# -------------------------
+feature_extractor = load_feature_extractor()
+caption_model = load_caption_model()
+tokenizer = load_tokenizer()
+
+# -------------------------
 # UI
 # -------------------------
 st.title("📷 Image Caption Generator")
-st.write("Upload an image and get an AI-generated caption.")
+st.write("Upload an image and let the AI describe it for you.")
 
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
@@ -100,10 +106,10 @@ if uploaded_file:
         img_array = preprocess_input(img_array)
 
         # Extract features
-        features = mobilenet_model.predict(img_array, verbose=0)
+        features = feature_extractor.predict(img_array, verbose=0)
 
         # Predict caption
-        caption = predict_caption(features)
+        caption = predict_caption(features, tokenizer, caption_model)
 
     st.success("Caption generated!")
     st.markdown(f"**Caption:** {caption}")
