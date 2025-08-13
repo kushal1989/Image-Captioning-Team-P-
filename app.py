@@ -19,19 +19,18 @@ st.set_page_config(page_title="📷 Image Caption Generator", page_icon="📷", 
 # Download model from Google Drive
 # -------------------------
 MODEL_PATH = "mymodel.h5"
-TOKENIZER_PATH = "tokenizer.pkl"
+TOKENIZER_PATH = "tokenizer.pkl"  # Keep this in GitHub or also use Drive
 
 @st.cache_resource
 def download_model():
     if not os.path.exists(MODEL_PATH):
-        file_id = "YOUR_FILE_ID"  # Replace with your actual Google Drive file ID
+        file_id = "1tBVQvprUw6woPkhNF2d-ZFhdywiSsLwY"
         url = f"https://drive.google.com/uc?id={file_id}"
         gdown.download(url, MODEL_PATH, quiet=False)
     return tf.keras.models.load_model(MODEL_PATH)
 
 @st.cache_resource
 def load_tokenizer():
-    # You can also store tokenizer.pkl in GitHub or Drive
     with open(TOKENIZER_PATH, "rb") as f:
         return pickle.load(f)
 
