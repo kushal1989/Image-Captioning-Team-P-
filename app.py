@@ -2,9 +2,11 @@ import streamlit as st
 import numpy as np
 import pickle
 import tensorflow as tf
+import gdown
+import os
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
+from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from PIL import Image
 
@@ -14,24 +16,32 @@ from PIL import Image
 st.set_page_config(page_title="📷 Image Caption Generator", page_icon="📷", layout="centered")
 
 # -------------------------
-# Load models & tokenizer
+# Download model from Google Drive
 # -------------------------
+MODEL_PATH = "mymodel.h5"
+TOKENIZER_PATH = "tokenizer.pkl"
+
+@st.cache_resource
+def download_model():
+    if not os.path.exists(MODEL_PATH):
+        file_id = "YOUR_FILE_ID"  # Replace with your actual Google Drive file ID
+        url = f"https://drive.google.com/uc?id={file_id}"
+        gdown.download(url, MODEL_PATH, quiet=False)
+    return tf.keras.models.load_model(MODEL_PATH)
+
+@st.cache_resource
+def load_tokenizer():
+    # You can also store tokenizer.pkl in GitHub or Drive
+    with open(TOKENIZER_PATH, "rb") as f:
+        return pickle.load(f)
+
 @st.cache_resource
 def load_mobilenet():
     base_model = MobileNetV2(weights="imagenet")
     return Model(inputs=base_model.inputs, outputs=base_model.layers[-2].output)
 
-@st.cache_resource
-def load_caption_model():
-    return tf.keras.models.load_model("mymodel.h5")
-
-@st.cache_resource
-def load_tokenizer():
-    with open("tokenizer.pkl", "rb") as f:
-        return pickle.load(f)
-
 mobilenet_model = load_mobilenet()
-caption_model = load_caption_model()
+caption_model = download_model()
 tokenizer = load_tokenizer()
 
 # -------------------------
