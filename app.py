@@ -15,11 +15,8 @@ from PIL import Image
 # CONFIG
 # -------------------------
 MODEL_PATH = "mymodel.h5"
-TOKENIZER_PATH = "tokenizer.pkl"
-
-# Google Drive file IDs
-MODEL_FILE_ID = "1tBVQvprUw6woPkhNF2d-ZFhdywiSsLwY"      # Replace with your model's Drive ID
-TOKENIZER_FILE_ID = "YOUR_TOKENIZER_FILE_ID"             # Replace with tokenizer's Drive ID
+TOKENIZER_PATH = "tokenizer.pkl"  # This will be in the repo
+MODEL_FILE_ID = "1tBVQvprUw6woPkhNF2d-ZFhdywiSsLwY"  # Your Google Drive model file ID
 
 st.set_page_config(page_title="📷 Image Caption Generator", page_icon="📷")
 
@@ -27,16 +24,11 @@ st.set_page_config(page_title="📷 Image Caption Generator", page_icon="📷")
 # FUNCTIONS
 # -------------------------
 @st.cache_resource
-def download_file(file_id, output_path):
-    """Download a file from Google Drive using gdown."""
-    if not os.path.exists(output_path):
-        url = f"https://drive.google.com/uc?id={file_id}"
-        gdown.download(url, output_path, quiet=False)
-    return output_path
-
-@st.cache_resource
-def load_caption_model():
-    download_file(MODEL_FILE_ID, MODEL_PATH)
+def download_model():
+    """Download model from Google Drive if not present."""
+    if not os.path.exists(MODEL_PATH):
+        url = f"https://drive.google.com/uc?id={MODEL_FILE_ID}"
+        gdown.download(url, MODEL_PATH, quiet=False)
     return tf.keras.models.load_model(
         MODEL_PATH,
         custom_objects={
@@ -50,7 +42,6 @@ def load_caption_model():
 
 @st.cache_resource
 def load_tokenizer():
-    download_file(TOKENIZER_FILE_ID, TOKENIZER_PATH)
     with open(TOKENIZER_PATH, "rb") as f:
         return pickle.load(f)
 
@@ -84,7 +75,7 @@ def predict_caption(image_features, tokenizer, model, max_length=34):
 # LOAD MODELS
 # -------------------------
 feature_extractor = load_feature_extractor()
-caption_model = load_caption_model()
+caption_model = download_model()
 tokenizer = load_tokenizer()
 
 # -------------------------
