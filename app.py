@@ -9,6 +9,7 @@ from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_i
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from PIL import Image
+from tensorflow.keras.layers import LSTM, Bidirectional, Embedding, Dense, Dropout
 
 # -------------------------
 # Page config
@@ -22,7 +23,7 @@ MODEL_PATH = "mymodel.h5"
 TOKENIZER_PATH = "tokenizer.pkl"  # Keep this in GitHub or also use Drive
 
 @st.cache_resource
-from tensorflow.keras.layers import LSTM, Bidirectional, Embedding, Dense, Dropout
+
 
 @st.cache_resource
 def download_model():
