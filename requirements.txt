@@ -1,5 +1,5 @@
 streamlit
 tensorflow==2.15.0
-gdown
+keras==2.15.0
 pillow
-
+gdown
